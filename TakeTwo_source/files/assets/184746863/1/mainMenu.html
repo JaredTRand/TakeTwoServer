@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Take Two</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+</head>
+
+<body onbeforeunload="return 'Are you sure you want to leave?'">
+
+<div id="mainBG-hero" class="w-100 h-100 text-center" style="left:0; position:absolute; background-position:center; background-image: url('{{mainBG}}');"></div>
+
+
+
+<div id="nav-bar-div">
+  <nav class="bg-body-tertiary" style="display:none; height:fit-content;" id="gameui-nav-bar">
+    <div class="container mw-100">
+      <div class="row">
+      <div class="col col-1" onclick="pc.app.fire('leaveRoomMidgame');" style="background-image: url('/api/assets/files/Art/taketwotemplogo.jpg?id=188072807&amp;branchId=e8aba187-b652-49cf-a7ab-886e877a3117&amp;t=8a2514e69ebd6c7312347a7680a55421');background-repeat: no-repeat;background-size: contain;">
+          
+      </div>
+        
+      <div class="col col-11 d-flex flex-row-reverse p-0" style="">   
+        <button id="toggleToastsBtn" data-toggled="on" type="button" class="m-1 p-1 btn btn-primary btn-sm" style="height: fit-content; margin: auto 0 auto 0;" onclick="pc.app.fire('toggleToasts')">
+          <svg id="bellon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M21 19v1H3v-1l2-2v-6c0-3.1 2.03-5.83 5-6.71V4a2 2 0 0 1 2-2a2 2 0 0 1 2 2v.29c2.97.88 5 3.61 5 6.71v6zm-7 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2"></path>
+          </svg>
+          <svg id="belloff" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M20.84 22.73L18.11 20H3v-1l2-2v-6c0-1.14.29-2.27.83-3.28L1.11 3l1.28-1.27l19.72 19.73zM19 15.8V11c0-3.1-2.03-5.83-5-6.71V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v.29c-.61.18-1.2.45-1.74.8zM12 23a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2" />
+          </svg>
+            <span id="toastcount" style="display:none; top:7px !important; right:1% !important;" class="position-absolute translate-middle badge rounded-pill bg-danger">
+              0
+            </span>
+
+        </button>
+        <span class="navbar-text" style="padding-right: 1rem;">Tiles Left</span>     
+        <span class="navbar-text" id="tiles-left-count" style="padding: 0 .5rem 0 .5rem; align-content: center;">7</span>
+        <button type="button" class="m-1 p-1 btn btn-primary btn-sm" style="height: fit-content; margin: auto 0 auto 0;" onclick="pc.app.fire('playerStuck')">Stuck</button>
+        <button type="button" class="m-1 p-1 btn btn-danger btn-sm" style="height: fit-content; margin: auto 0 auto 0;" onclick="pc.app.fire('recallAllInvalid')">Recall All Red</button>
+        
+        
+      </div>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<div class="row " style="position:relative;">
+  <div class="col justify-content-md-center">
+    <!-- <img class="main-menu-logo" src="{{take-two-logo}}" /> -->
+  </div>
+</div>
+<div class="modal-backdrop fade" style="z-index:0;" id="mainMenuBackdrop"></div>
+<div class="row main-page-div text-center">
+  <div class="col main-menu-bg fade show justify-content-center" align="center">
+    <div class="row">
+      <div class="col">
+        <div class="rounded" style="width:fit-content; padding:10px; background-color:rgba(255,255,255,0.5)">
+          <button type="button" onclick="pc.app.fire('createRoom');" class="btn btn-primary btn-lg" >Create Room</button>
+          <button type="button" class="btn btn-secondary btn-lg" onclick="pc.app.fire('showTextInputDiv-joinroom');">Join Room</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="rounded" style="width:fit-content; padding:10px; background-color:rgba(255,255,255,0.5)">
+          <button type="button" onclick="pc.app.fire('howToPlay');" class="btn btn-danger btn-lg" >How To Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" style="overflow: hidden" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 100%; height:90%; max-height:90vh;">
+    <div class="modal-content" style="height:100%">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <div class="container">
+            <div class="row">
+              <h3 class="modal-title" style="text-align:left;">Room</h3>
+            </div>
+            <div class="row"> 
+              <h2 class="modal-title" id="staticBackdropLabel" onclick="pc.app.fire('createsharelink')" style="color:red;text-align:left;cursor:pointer;">No Room Name</h2> 
+            </div>
+        </div>
+        <button onclick="pc.app.fire('leaveRoom')" type="button" class="btn btn-secondary leave-room-btn" data-bs-dismiss="modal" aria-label="Close">Leave Room</button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start">
+            <div class="col-8">
+              
+              <div class="container">
+                <div class="row">
+                  PLAYERS
+                </div>
+                <div class="row">
+                  <hr>
+                  <div id="player-list" class="list-group">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+<!--             <div class="col-4">  
+              <div class="container">
+                <div class="row">
+                  Game Rules
+                </div>
+                  <hr>
+                </div>
+              </div> -->
+
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary hide-if-not-gamemaster p-1" onclick="pc.app.fire('openSettings')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="28px" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 8a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2m-2 12c-.25 0-.46-.18-.5-.42l-.37-2.65c-.63-.25-1.17-.59-1.69-.99l-2.49 1.01c-.22.08-.49 0-.61-.22l-2-3.46a.493.493 0 0 1 .12-.64l2.11-1.66L4.5 12l.07-1l-2.11-1.63a.493.493 0 0 1-.12-.64l2-3.46c.12-.22.39-.31.61-.22l2.49 1c.52-.39 1.06-.73 1.69-.98l.37-2.65c.04-.24.25-.42.5-.42h4c.25 0 .46.18.5.42l.37 2.65c.63.25 1.17.59 1.69.98l2.49-1c.22-.09.49 0 .61.22l2 3.46c.13.22.07.49-.12.64L19.43 11l.07 1l-.07 1l2.11 1.63c.19.15.25.42.12.64l-2 3.46c-.12.22-.39.31-.61.22l-2.49-1c-.52.39-1.06.73-1.69.98l-.37 2.65c-.04.24-.25.42-.5.42zm1.25-18l-.37 2.61c-1.2.25-2.26.89-3.03 1.78L5.44 7.35l-.75 1.3L6.8 10.2a5.55 5.55 0 0 0 0 3.6l-2.12 1.56l.75 1.3l2.43-1.04c.77.88 1.82 1.52 3.01 1.76l.37 2.62h1.52l.37-2.61c1.19-.25 2.24-.89 3.01-1.77l2.43 1.04l.75-1.3l-2.12-1.55c.4-1.17.4-2.44 0-3.61l2.11-1.55l-.75-1.3l-2.41 1.04a5.42 5.42 0 0 0-3.03-1.77L12.75 4z" />
+          </svg>
+        </button>
+        <button type="button" class="btn btn-primary hide-if-not-gamemaster" onclick="pc.app.fire('startGame')">Start Game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="tutorialModal" style="overflow: hidden" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable" style="max-width: 100%; height:90%; max-height:90vh;">
+    <div class="modal-content" style="height:100%">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <div class="container">
+            <div class="row">
+              <h3 class="modal-title" style="text-align:left;">How To Play</h3>
+            </div>
+        </div>
+        <button onclick="" type="button" class="btn btn-secondary leave-room-btn" data-bs-dismiss="modal" aria-label="Close">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start">
+            <div class="col">
+              
+              <div class="container">
+                <div class="row">
+                  <div class="col" style="text-align:start;">
+                    <p><span style="font-size: large;"><strong>Take Two</strong></span> is about making words!</p>
+                    <p>Use letter tiles to form rows and columns of connected words to gain points.</p>
+                    <div id="tutorial-controls">
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+             </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myModal2" data-bs-keyboard="false" tabindex="-1" aria-labelledby="myModal2Label" aria-hidden="true">
+  <div class="modal-dialog text-input-div" >
+    <div class="modal-content">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <h5 class="modal-title" id="myModal2Label">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#myModal2" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start">
+            <div class="col-12">
+
+              <div class="input-group">
+                <input type="text" class="form-control" id="username-input" placeholder="Username" aria-label="Username" maxlength="50" aria-describedby="basic-addon1">
+              </div>
+
+            </div>
+          </div>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <div class="row w-100 row-cols-2">  
+          <div class="col col-6 ps-0 ms-0 float-start text-start">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-target="#myModal2" aria-label="Browse" onclick="pc.app.fire('BrowseRooms');">Browse Rooms</button>
+          </div>
+          <div class="col col-6 pe-0 me-0 float-end text-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#myModal2" aria-label="Close">Close</button>
+              <button type="button" class="btn btn-primary" id="submit-text-input" data-bs-dismiss="modal" data-bs-target="#myModal2" aria-label="Submit" onclick="pc.app.fire('joinRoom');">Join</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" style="z-index:0;"></div>
+</div>
+
+<div class="modal fade" id="room_browse_modal" style="overflow: hidden" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="room_browse_modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable" style="max-width: 100%; height:90%; max-height:90vh;">
+    <div class="modal-content" style="height:100%">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <div class="container">
+            <div class="row">
+              <h3 class="modal-title" style="text-align:left;">Browse Rooms</h3>
+            </div>
+        </div>
+        <button onclick="" type="button" class="btn btn-secondary leave-room-btn" data-bs-dismiss="modal" aria-label="Close">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start">
+            <div class="col">
+              
+              <div class="container">
+                <div class="row">
+                  <div class="col" style="text-align:start;">
+                    <input onkeyup="(function(){  var value = $('#browse_room_search').val().toLowerCase(); $('#browse_room_table tr').filter(function() { $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1) });  })()" class="form-control" id="browse_room_search" type="text" placeholder="Search...">
+                    <br>
+                    <table class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th>Room</th>
+                          <th>Status</th>
+                          <th>Players</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody id="browse_room_table">
+                        <!-- Room data goes here. html-handler.js -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+             </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="leaveRoomprompt" data-bs-keyboard="false" tabindex="-1" aria-labelledby="leaveRoompromptLabel" aria-hidden="true">
+  <div class="modal-dialog text-input-div" >
+    <div class="modal-content">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <h5 class="modal-title" id="leaveRoompromptLabel">Leave Room?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#leaveRoomprompt" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div>Are you sure you want to leave?</div>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#leaveRoomprompt" aria-label="Close">Cancel</button>
+              <button type="button" class="btn btn-primary"  onclick="pc.app.fire('goto_mainMenu')" data-bs-dismiss="modal" data-bs-target="#leaveRoomprompt" aria-label="Submit">Leave</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" style="z-index:0;"></div>
+</div>
+
+
+<div class="modal fade" id="blankLetterprompt" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="blankLetterpromptLabel" aria-hidden="true">
+  <div class="modal-dialog text-input-div" >
+    <div class="modal-content">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <h5 class="modal-title" id="blankLetterpromptLabel">Letter Select</h5>
+        <button onclick="pc.app.fire('blankPopupClosed')" type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row">
+            <div id="tileChangeData" class="col">
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">A</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">B</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">C</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">D</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">E</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">F</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">G</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">H</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">I</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">J</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">K</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">L</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">M</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">N</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">O</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">P</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">Q</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">R</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">S</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">T</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">U</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">V</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">W</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">X</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">Y</button>
+              <button onclick='pc.app.fire("blankLetterSelect", $(this).html())' type="button" class="btn btn-secondary blankletterselectbtn" data-bs-dismiss="modal" data-bs-target="#blankLetterprompt" aria-label="Close">Z</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" style="z-index:0;"></div>
+</div>
+
+<div class="modal fade" id="game-finish-screen" style="overflow: hidden" data-bs-backdrop="static" tabindex="-1" aria-labelledby="game-finish-screen-label" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 100%; height:90%; max-height:90vh;">
+    <div class="modal-content" style="height:100%">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <h5 class="modal-title" id="game-finish-screen-label">Final Scores</h5>
+        <div class="leave-room-btn">
+          <button onclick="pc.app.fire('goto_mainMenu')" type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#game-finish-screen" aria-label="Leave Room">Leave Room</button>
+          <button type="button" class="btn btn-primary hide-if-not-gamemaster" onclick="pc.app.fire('restartGame')" data-bs-dismiss="modal" data-bs-target="#game-finish-screen" aria-label="Play Again">Play Again</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start">
+            <div class="col">
+              <div class="list-group">
+                <h1>WINNER</h1>
+                <h1 class="list-group-item list-group-item-action active" id="winner-id">PLAYER X</h1>
+                <h2 class="list-group-item list-group-item-action" id="winner-score"> Points</h2>
+                <h2 class="list-group-item list-group-item-action" id="winner-total-score"> Total Points</h2>
+                <div class="list-group-item list-group-item-action" style="background-color:aliceblue;" id="winner-topthree">
+
+                  <div class="row justify-content-center" ><div class="col col-2">Top 3 Words</div>
+                    <div class="col col-1">
+                      <div class="d-flex" style="height: 100%;">
+                        <div class="vr"></div>
+                      </div>
+                    </div>
+                    <div class="col col-2"></div>
+
+                    <div id="winner-top-three-words" class="col col-auto" align="center" style="width: fit-content;">
+                        <!-- generated -->
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer overflow-hidden" style="height:33vh;">
+        <div class="container" style="height:100%; overflow-y:scroll;">
+          
+          <table class="table table-sm table-hover overflow-scroll">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Points</th>
+                <th scope="col">Total Points</th>
+                <th scope="col">All Words</th>
+              </tr>
+            </thead>
+            <tbody id="loser-scores-table" class="table-group-divider">
+
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="word-list-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="word-list-modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="z-index: 10000;">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <h5 class="modal-title" id="word-list-modalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#word-list-modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start">
+            <div class="list-group" id="word-list-modal-list" >
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" style="z-index:0;"></div>
+</div>
+
+<div class="modal fade" id="settings-modal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="settings-modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="z-index: 10000;">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color:#E3CFAA">
+        <div class="modal-title w-100" id="settings-modalLabel" >
+          <div class="container">
+            <div class="row">
+              <div style="display: flex;align-items: center;" class="col p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28px" height="28px" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M12 8a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2m-2 12c-.25 0-.46-.18-.5-.42l-.37-2.65c-.63-.25-1.17-.59-1.69-.99l-2.49 1.01c-.22.08-.49 0-.61-.22l-2-3.46a.493.493 0 0 1 .12-.64l2.11-1.66L4.5 12l.07-1l-2.11-1.63a.493.493 0 0 1-.12-.64l2-3.46c.12-.22.39-.31.61-.22l2.49 1c.52-.39 1.06-.73 1.69-.98l.37-2.65c.04-.24.25-.42.5-.42h4c.25 0 .46.18.5.42l.37 2.65c.63.25 1.17.59 1.69.98l2.49-1c.22-.09.49 0 .61.22l2 3.46c.13.22.07.49-.12.64L19.43 11l.07 1l-.07 1l2.11 1.63c.19.15.25.42.12.64l-2 3.46c-.12.22-.39.31-.61.22l-2.49-1c-.52.39-1.06.73-1.69.98l-.37 2.65c-.04.24-.25.42-.5.42zm1.25-18l-.37 2.61c-1.2.25-2.26.89-3.03 1.78L5.44 7.35l-.75 1.3L6.8 10.2a5.55 5.55 0 0 0 0 3.6l-2.12 1.56l.75 1.3l2.43-1.04c.77.88 1.82 1.52 3.01 1.76l.37 2.62h1.52l.37-2.61c1.19-.25 2.24-.89 3.01-1.77l2.43 1.04l.75-1.3l-2.12-1.55c.4-1.17.4-2.44 0-3.61l2.11-1.55l-.75-1.3l-2.41 1.04a5.42 5.42 0 0 0-3.03-1.77L12.75 4z" />
+                </svg>
+                <h5 class="m-0">Game Settings</h5>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" data-bs-target="#settings-modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row align-items-start"> 
+            <form>
+              <fieldset style="border-width: 2px;border-color: rgb(0 0 0);border-style: groove;border-image: initial;">
+                <legend style="float:none;width:auto;">
+                  <div class="form-check" style="display:flex;">
+                    <input type="checkbox" class="form-check-input" id="enableCustom">
+                    <label class="form-check-label" for="enableCustom">Enable Custom Settings</label>
+                  </div> 
+                </legend>
+
+                <div class="mb-3">
+                  <label for="tileSetCount" class="form-label">Number of Tile Sets</label>
+                  <input type="number" class="form-control" id="tileSetCount" aria-describedby="emailHelp">
+                  <div id="emailHelp" class="form-text">There are 100 Tiles in a set</div>
+                </div>
+
+              </fieldset>
+            </form>
+<!--             <form>
+              <fieldset>
+                <legend>
+                  <div class="mb-3 form-check" style="display:flex;">
+                    <input type="checkbox" class="form-check-input" id="enableCustom">
+                    <label class="form-check-label" for="enableCustom">Enable Custom Settings</label>
+                  </div> 
+                </legend>
+
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+
+                <label for="exampleInputPassword1" class="form-label">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1">
+
+              </fieldset>
+
+            </form> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" style="z-index:0;"></div>
+</div>
+
+
+</div>
+</body>
+</html>

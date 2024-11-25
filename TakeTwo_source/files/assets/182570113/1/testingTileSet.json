@@ -1,0 +1,12 @@
+{
+    "description": "Tile distribution and points for the English-language edition of Scrabble",
+    "letters":
+    {
+        "b": { "points":  3, "tiles":  2 },
+        "a": { "points":  1, "tiles":  4 },
+        "t": { "points":  1, "tiles":  2 },
+        "o": { "points":  1, "tiles":  2 },
+        "g": { "points":  2, "tiles":  2 },
+        "blank": { "points":  0, "tiles":  2 }
+    }
+}
