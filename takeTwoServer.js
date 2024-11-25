@@ -25,8 +25,6 @@ const jwt 	= require('jsonwebtoken');
 const uuid 	= require('uuid'); // USER IDs
 const hri 	= require('human-readable-ids').hri; //ROOM IDs / aliases
 
-var token = jwt.sign({ data: 'trivago' }, 'shhhhhthisisalittlesecretandnoonecanknowaboutit');
-
 
 console.log("token: ");
 console.log(token );
@@ -51,9 +49,8 @@ function Room (roomid, isPublic, gameMaster) {
 	this.tilePot = null;
 	this.tilePoints = null;
 	this.totalTileCount = null;
-	//this.gameInProgress = false;
 	this.outOfTiles = false;
-	this.gameStatus = null;
+	this.gameStatus = "WAITING";
 	this.players = {};
 	this.gameWinner = null;
 }
@@ -74,7 +71,7 @@ io.use(function(socket, next){
 })*/
 io.on('connection', socket => {
 //TODO validate every socket call, make sure ID exists. otherwise, assign new one?
-	if(!socket.handshake.headers.origin.includes("taketwo.jarofmilk.com")){
+	if(!socket.handshake.headers.origin.includes("taketwo.jarofmilk.com") && !socket.handshake.headers.origin.includes("html-classic.itch.zone")){
 		sendAlertToPlayer(socket, false, "Network Error Has Occurred.");
 		return;
 	}
@@ -215,11 +212,52 @@ io.on('connection', socket => {
 		}
 	});
 
+	socket.on('getRoomList', function(){ // send back every public room's Roomname, Playercount, status, 
+		if(!socket.initialized) sendAlertToPlayer(socket, false, "Network Error Has Occurred.");
+ 		var roomList = []
+
+		for(const [key, value] of Object.entries(rooms)){
+			if(!value.public || Object.keys(value.players).length <= 0) continue;
+
+			var roomName = value.id;
+			var playerCount = Object.keys(value.players).length;
+			var roomStatus = getRoomStatusReadable(value.gameStatus);
+
+			roomList.push({roomName, roomStatus, playerCount});
+		}
+		if(DEBUG) console.log("Sending room list...");
+		if(DEBUG) console.log(roomList);
+		socket.emit('sendRoomList', roomList);
+	});
+
 	socket.on('takeTwo', function(){   if(!socket.initialized) sendAlertToPlayer(socket, false, "Network Error Has Occurred."); takeTwo(socket);   });
 	socket.on('giveFinalScore', function(validWords, invalidWords, blanks){   if(!socket.initialized) sendAlertToPlayer(socket, false, "Network Error Has Occurred."); giveFinalScore(socket, validWords, invalidWords, blanks);   });
 	socket.on('playerStuck', function(){  if(!socket.initialized) sendAlertToPlayer(socket, false, "Network Error Has Occurred."); playerStuck(socket)   });
 
 });
+
+const getRoomStatusReadable = function(status){
+	var readableStatus = "";
+	switch(status.toLowerCase()) {
+	  case null || "waiting":
+	    readableStatus = "In Lobby"
+	    break;
+	  case "in_progress":
+	    readableStatus = "In Progress"
+	    break;
+	  case "scoring":
+	    readableStatus = "Scoring"
+	    break;
+	  case "gamefinished":
+	    readableStatus = "Game Finished"
+	    break;
+
+	  default:
+    	readableStatus = status;
+	} 
+	
+	return readableStatus;
+}
 
 const getRoomName = function(newroom){
 	if(!rooms[newroom]) return newroom;
