@@ -25,6 +25,8 @@ const jwt 	= require('jsonwebtoken');
 const uuid 	= require('uuid'); // USER IDs
 const hri 	= require('human-readable-ids').hri; //ROOM IDs / aliases
 
+var token = jwt.sign({ data: 'trivago' }, 'shhhhhthisisalittlesecretandnoonecanknowaboutit');
+
 
 console.log("token: ");
 console.log(token );
